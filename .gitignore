@@ -1,0 +1,14 @@
+**pycache**/
+*.pyc
+
+venv/
+.env
+
+data/raw/*
+data/processed/*
+
+.mlflow/
+
+.ipynb_checkpoints/
+
+.DS_Store
