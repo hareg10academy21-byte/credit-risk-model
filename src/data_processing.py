@@ -77,7 +77,7 @@ print(cluster_summary)
 high_risk_cluster = rfm.groupby("Cluster")["Monetary"].mean().idxmin()
 
 rfm["is_high_risk"] = (rfm["Cluster"] == high_risk_cluster).astype(int)
-# print(df.columns.tolist())
+
 
 
 df = df.merge(
