@@ -312,3 +312,7 @@ print(iv_df.sort_values(by="info_value", ascending=False))
 # ==================================================
 print("\nDataset Columns:")
 print(df.columns.tolist())
+# Save processed dataset for Task 5
+df.to_csv("data/processed_data.csv", index=False)
+
+print("Processed data saved successfully")
