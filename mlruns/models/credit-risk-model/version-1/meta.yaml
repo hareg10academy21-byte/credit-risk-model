@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1780489084375
+current_stage: None
+description: ''
+last_updated_timestamp: 1780489084375
+name: credit-risk-model
+run_id: f9d514b8c7964063a598ca3c735ce121
+run_link: ''
+source: file:///C:/Users/Hp/Desktop/credit-risk-model/mlruns/218391067070563147/f9d514b8c7964063a598ca3c735ce121/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///C:/Users/Hp/Desktop/credit-risk-model/mlruns/218391067070563147/f9d514b8c7964063a598ca3c735ce121/artifacts/model
+user_id: null
+version: 1
