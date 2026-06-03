@@ -6,18 +6,106 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
+from sklearn.cluster import KMeans
 
 # ==================================================
 # Load Data
 # ==================================================
 df = pd.read_csv("data/data.csv")
 
-TARGET = "FraudResult"
+
+# ==================================================
+# RFM FEATURE ENGINEERING
+# ==================================================
+
+df["TransactionStartTime"] = pd.to_datetime(
+    df["TransactionStartTime"]
+)
+
+snapshot_date = (
+    df["TransactionStartTime"].max()
+    + pd.Timedelta(days=1)
+)
+
+rfm = (
+    df.groupby("CustomerId")
+    .agg(
+        Recency=(
+            "TransactionStartTime",
+            lambda x: (
+                snapshot_date - x.max()
+            ).days
+        ),
+        Frequency=(
+            "TransactionId",
+            "count"
+        ),
+        Monetary=(
+            "Amount",
+            "sum"
+        )
+    )
+    .reset_index()
+)
+
+rfm_features = rfm[
+    ["Recency", "Frequency", "Monetary"]
+]
+
+scaler = StandardScaler()
+
+rfm_scaled = scaler.fit_transform(
+    rfm_features
+)
+
+
+kmeans = KMeans(
+    n_clusters=3,
+    random_state=42,
+    n_init=10
+)
+
+rfm["Cluster"] = kmeans.fit_predict(
+    rfm_scaled
+) 
+
+cluster_summary = (
+    rfm.groupby("Cluster")
+    [
+        ["Recency", "Frequency", "Monetary"]
+    ]
+    .mean()
+)
+
+print(cluster_summary)
+
+
+
+rfm["is_high_risk"] = (
+    rfm["Cluster"] == 0
+).astype(int)
+
+# print(df.columns.tolist())
+
+
+df = df.merge(
+    rfm[
+        ["CustomerId", "is_high_risk"]
+    ],
+    on="CustomerId",
+    how="left"
+)  
+
+TARGET = "is_high_risk"
 
 X = df.drop(columns=[TARGET])
 y = df[TARGET]
 
+print("\nDataset Columns:")
+print(df.columns.tolist())
+
+print("\nHigh Risk Distribution:")
+print(df["is_high_risk"].value_counts())
 
 # ==================================================
 # Feature Engineering Transformer
@@ -223,6 +311,10 @@ woe_df = sc.woebin_ply(
 )
 
 print(woe_df.head())
+iv_df = sc.iv(woe_df, y="is_high_risk")
+
+print("\nInformation Value:")
+print(iv_df.sort_values(by="info_value", ascending=False))
 # ==================================================
 # Display Columns
 # ==================================================
